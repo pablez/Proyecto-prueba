@@ -1,12 +1,12 @@
-version: '3.8'
 networks:
   laravel_network:
+
 services:
   server:
     build:
       context: .
       dockerfile: dockerfiles/nginx.dockerfile
-    container_name: laravel_server_futbol
+    container_name: laravel_restaurante_server
     ports:
       - "8080:80"
     volumes:
@@ -17,11 +17,12 @@ services:
       - mysql
     networks:
       - laravel_network
+
   php:
     build:
       context: .
       dockerfile: dockerfiles/php.dockerfile
-    container_name: laravel_php_futbol
+    container_name: laravel_restaurante_php
     volumes:
       - ./src:/var/www/html:delegated
     networks:
@@ -31,11 +32,11 @@ services:
       interval: 5s
       timeout: 2s
       retries: 10
+
   mysql:
     image: mysql:8.0.1
-    container_name: laravel_mysql_futbol
+    container_name: laravel_restaurante_mysql
     restart: unless-stopped
-    tty: true
     env_file:
       - mysql/.env
     ports:
@@ -44,10 +45,11 @@ services:
       - ./mysql_data:/var/lib/mysql
     networks:
       - laravel_network
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     restart: always
-    container_name: laravel_phpmyadmin_futbol
+    container_name: laravel_phpmyadmin
     depends_on:
       - mysql
     ports:
@@ -58,6 +60,7 @@ services:
       - PMA_PASSWORD=root.pa55
     networks:
       - laravel_network
+
   composer:
     build:
       context: .
@@ -65,13 +68,14 @@ services:
     volumes:
       - ./src:/var/www/html
     depends_on:
-      - php
+      - php 
     networks:
       - laravel_network
+
   artisan:
     build:
       context: .
-      dockerfile: dockerfiles/php.dockerfile
+      dockerfile: dockerfiles/php.dockerfile 
     volumes:
       - ./src:/var/www/html
     entrypoint: ["php", "/var/www/html/artisan"]
